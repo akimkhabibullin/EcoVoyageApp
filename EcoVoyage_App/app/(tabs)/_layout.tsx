@@ -31,6 +31,9 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          headerStyle: { backgroundColor: '#97e28f' },
+          headerTintColor: '#',
+          headerTitleStyle: { fontWeight: 'bold' },
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -38,7 +41,7 @@ export default function TabLayout() {
                   <FontAwesome
                     name="bars"
                     size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
+                    color="#"
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -52,6 +55,23 @@ export default function TabLayout() {
         options={{
           title: 'History',
           tabBarIcon: ({ color }) => <TabBarIcon name="history" color={color} />,
+          headerStyle: { backgroundColor: '#97e28f' },
+          headerTintColor: '#',
+          headerTitleStyle: { fontWeight: 'bold' },
+          headerRight: () => (
+            <Link href="/modal" asChild>
+              <Pressable>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="bars"
+                    size={25}
+                    color="#"
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
+          ),
         }}
       />
     </Tabs>
