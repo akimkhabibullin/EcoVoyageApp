@@ -1,5 +1,6 @@
-import { StyleSheet, TextInput } from 'react-native';
+import { StyleSheet, TextInput, Pressable } from 'react-native';
 import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
 
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
@@ -7,6 +8,7 @@ import { Text, View } from '@/components/Themed';
 export default function TabOneScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -33,7 +35,13 @@ export default function TabOneScreen() {
           autoCapitalize="none"
           secureTextEntry
         />
-        </View>
+      </View>
+      <Pressable
+        style={styles.enterButton}
+        onPress={() => router.push('/(tabs)/history')}
+        >
+        <Text style={styles.enterText}>Enter</Text>
+      </Pressable>
     </View>
   );
 }
@@ -43,7 +51,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start', 
-    marginTop: 200, 
+    paddingTop: 160,
+    backgroundColor: '#97e28f', 
   },
   title: {
     fontSize: 20,
@@ -79,5 +88,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     fontSize: 13,
     marginLeft: 16,
+  },
+  enterButton: {
+    backgroundColor: '#39a465',
+    marginTop: 10,
+    borderRadius: 10,
+  },
+  enterText: {
+    margin: 10,
+    fontWeight: 'bold',
   },
 });

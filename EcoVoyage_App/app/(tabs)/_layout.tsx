@@ -32,7 +32,7 @@ export default function TabLayout() {
           title: 'Login',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           headerStyle: { backgroundColor: '#97e28f' },
-          headerTintColor: '#',
+          headerTintColor: '#fff',
           tabBarStyle: { display: 'none' },
         }}
       />
@@ -42,7 +42,7 @@ export default function TabLayout() {
           title: 'History',
           tabBarIcon: ({ color }) => <TabBarIcon name="history" color={color} />,
           headerStyle: { backgroundColor: '#97e28f' },
-          headerTintColor: '#',
+          headerTintColor: '#000',
           headerTitleStyle: { fontWeight: 'bold' },
           headerRight: () => (
             <Link href="/modal" asChild>
