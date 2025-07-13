@@ -11,15 +11,6 @@ type UserScore = {
   rank: number;
 };
 
-type Reward = {
-  id: string;
-  title: string;
-  description: string;
-  pointsRequired: number;
-  icon: string;
-  claimed: boolean;
-};
-
 export default function LeaderboardScreen() {
   const router = useRouter();
 
@@ -59,7 +50,7 @@ export default function LeaderboardScreen() {
       
       <Pressable
         style={styles.backButton}
-        onPress={() => router.push('/(tabs)/history')}
+        onPress={() => router.push('/(tabs)/home')}
       >
         <Text style={styles.backButtonText}>Back</Text>
       </Pressable>

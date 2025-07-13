@@ -3,15 +3,7 @@ import React from 'react';
 import { useRouter } from 'expo-router';
 import { Text, View } from '@/components/Themed';
 
-type UserScore = {
-  id: string;
-  name: string;
-  points: number;
-  avatar: string;
-  rank: number;
-};
-
-type Reward = {
+export type Reward = {
   id: string;
   title: string;
   description: string;
@@ -20,9 +12,35 @@ type Reward = {
   claimed: boolean;
 };
 
-export default function LeaderboardScreen() {
-  const router = useRouter();
+export type UserPoints = {
+  userId: string;
+  points: number;
+};
 
+export interface Database {
+  // Reward methods
+  createReward(reward: Omit<Reward, 'id'>): Promise<Reward>;
+  getRewards(): Promise<Reward[]>;
+  getRewardById(id: string): Promise<Reward | null>;
+  
+  // Points methods
+  getUserPoints(userId: string): Promise<UserPoints>;
+  updateUserPoints(userId: string, pointsChange: number): Promise<UserPoints>;
+}
+
+export default function RewardsScreen() {
+  const router = useRouter();
+  
+  const pointsData: UserPoints[] = [
+    {userId: 'Sam : ', points: 200}
+  ]
+
+  const renderPoints = ({ item }: { item: UserPoints }) =>(
+    <View style={[styles.pointItem]}>
+      <Text style={styles.title}>{item.userId}</Text>
+      <Text style={styles.title}>{item.points}</Text>
+    </View>
+  );
   //Change to real rewards
   // Sample data for rewards
   const rewardsData: Reward[] = [
@@ -52,6 +70,14 @@ export default function LeaderboardScreen() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Your Points</Text>
+      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      
+      <FlatList 
+        data={pointsData}
+        renderItem={renderPoints}
+      />
+
       <Text style={styles.title}>Your Rewards</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       
@@ -65,10 +91,10 @@ export default function LeaderboardScreen() {
       
       <Pressable
               style={styles.backButton}
-              onPress={() => router.push('/(tabs)/history')}
+              onPress={() => router.push('/(tabs)/home')}
               >
               <Text style={styles.backButtonText}>Back</Text>
-        </Pressable>
+      </Pressable>
     </View>
   );
 }
@@ -157,6 +183,16 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
   },
+
+  pointItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#39a465',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+  },
+
   claimedReward: {
     opacity: 0.7,
   },
