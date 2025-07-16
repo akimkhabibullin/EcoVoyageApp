@@ -60,13 +60,37 @@ export default function RewardsScreen() {
         <Text style={styles.rewardPoints}>{item.pointsRequired} points</Text>
       </View>
       <Pressable 
-        style={[styles.claimButton, item.claimed ? styles.claimedButton : null]}
-        disabled={item.claimed || item.pointsRequired > 420} // 420 is current user's points
+        style={({ pressed }) => [
+          styles.claimButton, 
+          item.claimed ? styles.claimedButton : null,
+          pressed && !item.claimed && item.pointsRequired <= 420 && styles.claimedButton
+        ]}
+        disabled={item.claimed || item.pointsRequired > 420}
       >
-        <Text style={styles.claimButtonText}>{item.claimed ? 'Claimed' : 'Claim'}</Text>
+        {({ pressed }) => (
+          <Text style={styles.claimButtonText}>
+            {item.claimed ? 'Claimed' : (pressed ? 'Claiming...' : 'Claim')}
+          </Text>
+        )}
       </Pressable>
     </View>
   );
+  // const renderRewardItem = ({ item }: { item: Reward }) => (
+  //   <View style={[styles.rewardItem, item.claimed ? styles.claimedReward : null]}>
+  //     <Text style={styles.rewardIcon}>{item.icon}</Text>
+  //     <View style={styles.rewardTextContainer}>
+  //       <Text style={styles.rewardTitle}>{item.title}</Text>
+  //       <Text style={styles.rewardDesc}>{item.description}</Text>
+  //       <Text style={styles.rewardPoints}>{item.pointsRequired} points</Text>
+  //     </View>
+  //     <Pressable 
+  //       style={[styles.claimButton, item.claimed ? styles.claimedButton : null]}
+  //       disabled={item.claimed || item.pointsRequired > 420} // 420 is current user's points
+  //     >
+  //       <Text style={styles.claimButtonText}>{item.claimed ? 'Claimed' : 'Claim'}</Text>
+  //     </Pressable>
+  //   </View>
+  // );
 
   return (
     <View style={styles.container}>
