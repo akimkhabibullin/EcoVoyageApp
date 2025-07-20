@@ -50,7 +50,7 @@ export default function MapScreen() {
     ul.autocomplete-list li:hover {
       background-color: #eee;
     }
-    #distance, #cost, #emissions, #duration, #error {
+    #distance, #cost, #emissions, #duration, #co2saved, #error {
       padding: 8px 10px;
       font-weight: bold;
     }
@@ -103,6 +103,7 @@ export default function MapScreen() {
   <div id="cost">Cost: N/A</div>
   <div id="emissions">CO₂ Emissions: N/A</div>
   <div id="duration">Estimated Time: N/A</div>
+  <div id="co2saved">CO₂ Saved Compared to Car: N/A</div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -235,6 +236,7 @@ export default function MapScreen() {
       document.getElementById("cost").textContent = "Cost: N/A";
       document.getElementById("emissions").textContent = "CO₂ Emissions: N/A";
       document.getElementById("duration").textContent = "Estimated Time: N/A";
+      document.getElementById("co2saved").textContent = "CO₂ Saved Compared to Car: N/A";
     }
 
     function clearMap() {
@@ -294,6 +296,9 @@ export default function MapScreen() {
 
       const cost = modeData.costPerMile * miles;
       const emissions = modeData.emissionsPerMile * miles;
+      const carEmissions = travelData["car"].emissionsPerMile * miles;
+      const co2Saved = Math.max(0, carEmissions - emissions);
+
       const durationHours = miles / modeData.speedMph;
       const hours = Math.floor(durationHours);
       const minutes = Math.round((durationHours - hours) * 60);
@@ -302,6 +307,7 @@ export default function MapScreen() {
       document.getElementById("cost").textContent = "Cost: $" + cost.toFixed(2);
       document.getElementById("emissions").textContent = "CO₂ Emissions: " + emissions.toFixed(2) + " kg";
       document.getElementById("duration").textContent = "Estimated Time: " + durationStr;
+      document.getElementById("co2saved").textContent = "CO₂ Saved Compared to Car: " + co2Saved.toFixed(2) + " kg";
     }
 
     setupAutocomplete("from", "from-list", coords => {
