@@ -1,7 +1,8 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Pressable } from "react-native";
 import { WebView } from "react-native-webview";
-import { View } from "@/components/Themed";
+import { View, Text } from "@/components/Themed";
+import { router } from 'expo-router';
 
 export default function MapScreen() {
   const htmlContent = `
@@ -26,7 +27,12 @@ export default function MapScreen() {
       flex-direction: column;
       gap: 10px;
     }
-    input, select, button {
+    input {
+      width: 95%;
+      padding: 8px;
+      font-size: 16px;
+    }
+    select, button {
       width: 100%;
       padding: 8px;
       font-size: 16px;
@@ -53,6 +59,7 @@ export default function MapScreen() {
     #distance, #cost, #emissions, #duration, #co2saved, #error {
       padding: 8px 10px;
       font-weight: bold;
+      background-color: #97e28f;
     }
     #error {
       color: red;
@@ -476,6 +483,12 @@ export default function MapScreen() {
         domStorageEnabled
         startInLoadingState
       />
+      <Pressable
+        style={styles.backButton}
+        onPress={() => router.push('/(tabs)/home')}
+        >
+        <Text style={styles.backButtonText}>Back</Text>
+      </Pressable>
     </View>
   );
 }
@@ -483,4 +496,19 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   webview: { flex: 1 },
+
+  backButton: {
+    backgroundColor: '#39a465',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    marginTop: 10,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
