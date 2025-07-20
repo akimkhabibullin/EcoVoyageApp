@@ -38,7 +38,7 @@ export default function TabOneScreen() {
       </View>
       <Pressable
         style={styles.enterButton}
-        onPress={() => router.push('/(tabs)/history')}
+        onPress={() => router.push('/(tabs)/home')}
         >
         <Text style={styles.enterText}>Enter</Text>
       </Pressable>
