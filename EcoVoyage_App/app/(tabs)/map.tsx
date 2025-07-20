@@ -50,7 +50,7 @@ export default function MapScreen() {
     ul.autocomplete-list li:hover {
       background-color: #eee;
     }
-    #distance, #cost, #emissions, #error {
+    #distance, #cost, #emissions, #duration, #error {
       padding: 8px 10px;
       font-weight: bold;
     }
@@ -102,6 +102,7 @@ export default function MapScreen() {
   <div id="distance">Distance: N/A</div>
   <div id="cost">Cost: N/A</div>
   <div id="emissions">CO₂ Emissions: N/A</div>
+  <div id="duration">Estimated Time: N/A</div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -117,14 +118,14 @@ export default function MapScreen() {
     let toMarker = null;
 
     const travelData = {
-      walk:       { costPerMile: 0,    emissionsPerMile: 0,       allowsWater: false },
-      bike:       { costPerMile: 0,    emissionsPerMile: 0,       allowsWater: false },
-      ebike:      { costPerMile: 0.02, emissionsPerMile: 0.015,   allowsWater: false },
-      car:        { costPerMile: 0.58, emissionsPerMile: 0.404,   allowsWater: false },
-      bus:        { costPerMile: 0.24, emissionsPerMile: 0.089,   allowsWater: false },
-      motorcycle: { costPerMile: 0.35, emissionsPerMile: 0.103,   allowsWater: false },
-      truck:      { costPerMile: 0.65, emissionsPerMile: 1.07,    allowsWater: false },
-      airplane:   { costPerMile: 0.13, emissionsPerMile: 0.285,   allowsWater: true  },
+      walk:       { costPerMile: 0,    emissionsPerMile: 0,       allowsWater: false, speedMph: 3 },
+      bike:       { costPerMile: 0,    emissionsPerMile: 0,       allowsWater: false, speedMph: 10 },
+      ebike:      { costPerMile: 0.02, emissionsPerMile: 0.015,   allowsWater: false, speedMph: 20 },
+      car:        { costPerMile: 0.58, emissionsPerMile: 0.404,   allowsWater: false, speedMph: 45 },
+      bus:        { costPerMile: 0.24, emissionsPerMile: 0.089,   allowsWater: false, speedMph: 30 },
+      motorcycle: { costPerMile: 0.35, emissionsPerMile: 0.103,   allowsWater: false, speedMph: 50 },
+      truck:      { costPerMile: 0.65, emissionsPerMile: 1.07,    allowsWater: false, speedMph: 40 },
+      airplane:   { costPerMile: 0.13, emissionsPerMile: 0.285,   allowsWater: true,  speedMph: 500 },
     };
 
     function distanceKm(coord1, coord2) {
@@ -214,7 +215,6 @@ export default function MapScreen() {
     function crossesWater(from, to) {
       const contFrom = getContinent(from[0], from[1]);
       const contTo = getContinent(to[0], to[1]);
-
       if (contFrom === "OTHER" || contTo === "OTHER") return true;
       return contFrom !== contTo;
     }
@@ -234,18 +234,15 @@ export default function MapScreen() {
       document.getElementById("distance").textContent = "Distance: N/A";
       document.getElementById("cost").textContent = "Cost: N/A";
       document.getElementById("emissions").textContent = "CO₂ Emissions: N/A";
+      document.getElementById("duration").textContent = "Estimated Time: N/A";
     }
 
     function clearMap() {
       if (fromMarker) { fromMarker.remove(); fromMarker = null; }
       if (toMarker) { toMarker.remove(); toMarker = null; }
 
-      if (map.getLayer("route")) {
-        map.removeLayer("route");
-      }
-      if (map.getSource("route")) {
-        map.removeSource("route");
-      }
+      if (map.getLayer("route")) map.removeLayer("route");
+      if (map.getSource("route")) map.removeSource("route");
     }
 
     function calculateAndDisplay() {
@@ -279,26 +276,13 @@ export default function MapScreen() {
         },
       };
 
-      if (map.getLayer("route")) map.removeLayer("route");
-      if (map.getSource("route")) map.removeSource("route");
-
-      map.addSource("route", {
-        type: "geojson",
-        data: routeGeoJSON,
-      });
-
+      map.addSource("route", { type: "geojson", data: routeGeoJSON });
       map.addLayer({
         id: "route",
         type: "line",
         source: "route",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#0074D9",
-          "line-width": 4,
-        },
+        layout: { "line-join": "round", "line-cap": "round" },
+        paint: { "line-color": "#0074D9", "line-width": 4 },
       });
 
       const bounds = new maplibregl.LngLatBounds();
@@ -310,9 +294,14 @@ export default function MapScreen() {
 
       const cost = modeData.costPerMile * miles;
       const emissions = modeData.emissionsPerMile * miles;
+      const durationHours = miles / modeData.speedMph;
+      const hours = Math.floor(durationHours);
+      const minutes = Math.round((durationHours - hours) * 60);
+      const durationStr = hours > 0 ? \`\${hours} hr \${minutes} min\` : \`\${minutes} min\`;
 
       document.getElementById("cost").textContent = "Cost: $" + cost.toFixed(2);
       document.getElementById("emissions").textContent = "CO₂ Emissions: " + emissions.toFixed(2) + " kg";
+      document.getElementById("duration").textContent = "Estimated Time: " + durationStr;
     }
 
     setupAutocomplete("from", "from-list", coords => {
