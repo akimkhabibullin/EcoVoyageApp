@@ -73,6 +73,11 @@ export default function MapScreen() {
       background-color: #a5d6a7;
       cursor: not-allowed;
     }
+    #car-options {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
   </style>
 </head>
 <body>
@@ -96,6 +101,21 @@ export default function MapScreen() {
       <option value="truck">Truck</option>
       <option value="airplane">Airplane</option>
     </select>
+
+    <div id="car-options">
+      <select id="car-brand">
+        <option value="" disabled selected>Select car brand</option>
+        <option value="Toyota">Toyota</option>
+        <option value="Mercedes-Benz">Mercedes-Benz</option>
+        <option value="Tesla">Tesla</option>
+        <option value="Kia">Kia</option>
+        <option value="Volkswagen">Volkswagen</option>
+      </select>
+      <select id="car-model">
+        <option value="" disabled selected>Select model</option>
+      </select>
+    </div>
+
     <button id="enter-btn" disabled>Enter</button>
   </div>
   <div id="error"></div>
@@ -128,6 +148,73 @@ export default function MapScreen() {
       truck:      { costPerMile: 0.65, emissionsPerMile: 1.07,    allowsWater: false, speedMph: 40 },
       airplane:   { costPerMile: 0.13, emissionsPerMile: 0.285,   allowsWater: true,  speedMph: 500 },
     };
+
+    const carModels = {
+      "Toyota": [
+        { model: "Camry", costPerMile: 0.50, emissionsPerMile: 0.30 },
+        { model: "Corolla", costPerMile: 0.45, emissionsPerMile: 0.28 },
+        { model: "RAV4", costPerMile: 0.55, emissionsPerMile: 0.32 },
+        { model: "Highlander", costPerMile: 0.60, emissionsPerMile: 0.35 },
+        { model: "Prius", costPerMile: 0.40, emissionsPerMile: 0.10 },
+        { model: "Tacoma", costPerMile: 0.65, emissionsPerMile: 0.38 },
+        { model: "Tundra", costPerMile: 0.70, emissionsPerMile: 0.42 },
+        { model: "Avalon", costPerMile: 0.55, emissionsPerMile: 0.31 },
+        { model: "Sequoia", costPerMile: 0.72, emissionsPerMile: 0.45 },
+        { model: "4Runner", costPerMile: 0.68, emissionsPerMile: 0.40 },
+      ],
+      "Mercedes-Benz": [
+        { model: "C-Class", costPerMile: 0.70, emissionsPerMile: 0.38 },
+        { model: "E-Class", costPerMile: 0.75, emissionsPerMile: 0.42 },
+        { model: "S-Class", costPerMile: 0.90, emissionsPerMile: 0.50 },
+        { model: "GLA", costPerMile: 0.65, emissionsPerMile: 0.36 },
+        { model: "GLC", costPerMile: 0.72, emissionsPerMile: 0.39 },
+        { model: "GLE", costPerMile: 0.80, emissionsPerMile: 0.44 },
+        { model: "GLS", costPerMile: 0.95, emissionsPerMile: 0.52 },
+        { model: "A-Class", costPerMile: 0.60, emissionsPerMile: 0.33 },
+        { model: "CLA", costPerMile: 0.65, emissionsPerMile: 0.35 },
+        { model: "EQC", costPerMile: 0.50, emissionsPerMile: 0.05 },
+      ],
+      "Tesla": [
+        { model: "Model S", costPerMile: 0.30, emissionsPerMile: 0.00 },
+        { model: "Model 3", costPerMile: 0.25, emissionsPerMile: 0.00 },
+        { model: "Model X", costPerMile: 0.35, emissionsPerMile: 0.00 },
+        { model: "Model Y", costPerMile: 0.28, emissionsPerMile: 0.00 },
+        { model: "Cybertruck", costPerMile: 0.40, emissionsPerMile: 0.00 },
+        { model: "Roadster", costPerMile: 0.38, emissionsPerMile: 0.00 },
+        { model: "Semi", costPerMile: 0.50, emissionsPerMile: 0.00 },
+        { model: "Model 3 LR", costPerMile: 0.27, emissionsPerMile: 0.00 },
+        { model: "Model Y Performance", costPerMile: 0.32, emissionsPerMile: 0.00 },
+        { model: "Model S Plaid", costPerMile: 0.34, emissionsPerMile: 0.00 },
+      ],
+      "Kia": [
+        { model: "Rio", costPerMile: 0.42, emissionsPerMile: 0.26 },
+        { model: "Forte", costPerMile: 0.44, emissionsPerMile: 0.27 },
+        { model: "Optima", costPerMile: 0.50, emissionsPerMile: 0.29 },
+        { model: "Stinger", costPerMile: 0.55, emissionsPerMile: 0.33 },
+        { model: "Soul", costPerMile: 0.48, emissionsPerMile: 0.30 },
+        { model: "Sportage", costPerMile: 0.52, emissionsPerMile: 0.34 },
+        { model: "Sorento", costPerMile: 0.60, emissionsPerMile: 0.37 },
+        { model: "Telluride", costPerMile: 0.62, emissionsPerMile: 0.39 },
+        { model: "Niro", costPerMile: 0.40, emissionsPerMile: 0.20 },
+        { model: "EV6", costPerMile: 0.35, emissionsPerMile: 0.00 },
+      ],
+      "Volkswagen": [
+        { model: "Golf", costPerMile: 0.46, emissionsPerMile: 0.28 },
+        { model: "Jetta", costPerMile: 0.44, emissionsPerMile: 0.27 },
+        { model: "Passat", costPerMile: 0.48, emissionsPerMile: 0.30 },
+        { model: "Arteon", costPerMile: 0.50, emissionsPerMile: 0.31 },
+        { model: "Tiguan", costPerMile: 0.55, emissionsPerMile: 0.34 },
+        { model: "Atlas", costPerMile: 0.60, emissionsPerMile: 0.36 },
+        { model: "Taos", costPerMile: 0.52, emissionsPerMile: 0.32 },
+        { model: "ID.4", costPerMile: 0.34, emissionsPerMile: 0.00 },
+        { model: "Beetle", costPerMile: 0.47, emissionsPerMile: 0.29 },
+        { model: "Polo", costPerMile: 0.42, emissionsPerMile: 0.27 },
+      ],
+    };
+
+    let fromCoords = null;
+    let toCoords = null;
+    let travelMode = null;
 
     function distanceKm(coord1, coord2) {
       const toRad = (deg) => deg * Math.PI / 180;
@@ -220,13 +307,17 @@ export default function MapScreen() {
       return contFrom !== contTo;
     }
 
-    let fromCoords = null;
-    let toCoords = null;
-    let travelMode = null;
-
     function updateEnterButton() {
       const btn = document.getElementById("enter-btn");
-      btn.disabled = !(fromCoords && toCoords && travelMode);
+      const carOptions = document.getElementById("car-options");
+      let carModelSelected = true;
+
+      if (travelMode === "car") {
+        const modelVal = document.getElementById("car-model").value;
+        carModelSelected = !!modelVal;
+      }
+
+      btn.disabled = !(fromCoords && toCoords && travelMode && carModelSelected);
       clearMessages();
     }
 
@@ -259,55 +350,73 @@ export default function MapScreen() {
         return;
       }
 
-      const modeData = travelData[travelMode];
-      const waterCrossing = crossesWater(fromCoords, toCoords);
-
-      if (!modeData.allowsWater && waterCrossing) {
-        document.getElementById("error").textContent = travelMode.charAt(0).toUpperCase() + travelMode.slice(1) + " cannot travel over water.";
-        return;
+      if (travelMode === "airplane" && crossesWater(fromCoords, toCoords)) {
+        // Allowed to cross water
+      } else {
+        if (crossesWater(fromCoords, toCoords)) {
+          document.getElementById("error").textContent = "Selected travel mode cannot cross large bodies of water.";
+          return;
+        }
       }
 
-      fromMarker = new maplibregl.Marker({ color: "green" }).setLngLat(fromCoords).addTo(map);
-      toMarker = new maplibregl.Marker({ color: "red" }).setLngLat(toCoords).addTo(map);
+      let modeData = travelData[travelMode];
+      if (travelMode === "car") {
+        const modelData = document.getElementById("car-model").value;
+        if (modelData) {
+          modeData = JSON.parse(modelData);
+          // Add speedMph from generic car data
+          modeData.speedMph = travelData.car.speedMph;
+        } else {
+          document.getElementById("error").textContent = "Please select a car model.";
+          return;
+        }
+      }
 
-      const routeGeoJSON = {
-        type: "Feature",
-        geometry: {
-          type: "LineString",
-          coordinates: [fromCoords, toCoords],
-        },
-      };
-
-      map.addSource("route", { type: "geojson", data: routeGeoJSON });
-      map.addLayer({
-        id: "route",
-        type: "line",
-        source: "route",
-        layout: { "line-join": "round", "line-cap": "round" },
-        paint: { "line-color": "#0074D9", "line-width": 4 },
-      });
-
-      const bounds = new maplibregl.LngLatBounds();
-      bounds.extend(fromCoords);
-      bounds.extend(toCoords);
-      map.fitBounds(bounds, { padding: 40 });
-
-      document.getElementById("distance").textContent = "Distance: " + miles.toFixed(2) + " miles";
-
-      const cost = modeData.costPerMile * miles;
-      const emissions = modeData.emissionsPerMile * miles;
-      const carEmissions = travelData["car"].emissionsPerMile * miles;
-      const co2Saved = Math.max(0, carEmissions - emissions);
-
+      const cost = (modeData.costPerMile * miles).toFixed(2);
+      const emissions = (modeData.emissionsPerMile * miles).toFixed(2);
       const durationHours = miles / modeData.speedMph;
       const hours = Math.floor(durationHours);
       const minutes = Math.round((durationHours - hours) * 60);
       const durationStr = hours > 0 ? \`\${hours} hr \${minutes} min\` : \`\${minutes} min\`;
 
-      document.getElementById("cost").textContent = "Cost: $" + cost.toFixed(2);
-      document.getElementById("emissions").textContent = "CO₂ Emissions: " + emissions.toFixed(2) + " kg";
-      document.getElementById("duration").textContent = "Estimated Time: " + durationStr;
-      document.getElementById("co2saved").textContent = "CO₂ Saved Compared to Car: " + co2Saved.toFixed(2) + " kg";
+      // Calculate CO2 saved compared to generic car
+      const genericCarEmissions = travelData.car.emissionsPerMile * miles;
+      const co2Saved = (genericCarEmissions - emissions).toFixed(2);
+
+      // Add markers
+      fromMarker = new maplibregl.Marker({ color: "green" }).setLngLat(fromCoords).addTo(map);
+      toMarker = new maplibregl.Marker({ color: "red" }).setLngLat(toCoords).addTo(map);
+
+      // Fit map to bounds
+      const bounds = new maplibregl.LngLatBounds();
+      bounds.extend(fromCoords);
+      bounds.extend(toCoords);
+      map.fitBounds(bounds, { padding: 100 });
+
+      // Draw line
+      map.addSource("route", {
+        type: "geojson",
+        data: {
+          type: "Feature",
+          geometry: {
+            type: "LineString",
+            coordinates: [fromCoords, toCoords],
+          }
+        }
+      });
+      map.addLayer({
+        id: "route",
+        type: "line",
+        source: "route",
+        layout: { "line-cap": "round", "line-join": "round" },
+        paint: { "line-color": "#0074D9", "line-width": 5 },
+      });
+
+      document.getElementById("distance").textContent = \`Distance: \${miles.toFixed(1)} miles\`;
+      document.getElementById("cost").textContent = \`Cost: $\${cost}\`;
+      document.getElementById("emissions").textContent = \`CO₂ Emissions: \${emissions} kg\`;
+      document.getElementById("duration").textContent = \`Estimated Time: \${durationStr}\`;
+      document.getElementById("co2saved").textContent = \`CO₂ Saved Compared to Car: \${co2Saved} kg\`;
     }
 
     setupAutocomplete("from", "from-list", coords => {
@@ -322,18 +431,40 @@ export default function MapScreen() {
 
     document.getElementById("travel-mode").addEventListener("change", (e) => {
       travelMode = e.target.value;
+      if (travelMode === "car") {
+        document.getElementById("car-options").style.display = "flex";
+      } else {
+        document.getElementById("car-options").style.display = "none";
+        document.getElementById("car-brand").value = "";
+        document.getElementById("car-model").innerHTML = '<option value="" disabled selected>Select model</option>';
+      }
       updateEnterButton();
     });
 
-    document.getElementById("enter-btn").addEventListener("click", () => {
-      if (fromCoords && toCoords && travelMode) {
-        calculateAndDisplay();
+    document.getElementById("car-brand").addEventListener("change", (e) => {
+      const brand = e.target.value;
+      const modelSelect = document.getElementById("car-model");
+      modelSelect.innerHTML = '<option value="" disabled selected>Select model</option>';
+      if (carModels[brand]) {
+        carModels[brand].forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = JSON.stringify(m);
+          opt.textContent = m.model;
+          modelSelect.appendChild(opt);
+        });
       }
+      updateEnterButton();
+    });
+
+    document.getElementById("car-model").addEventListener("change", updateEnterButton);
+
+    document.getElementById("enter-btn").addEventListener("click", () => {
+      calculateAndDisplay();
     });
   </script>
 </body>
 </html>
-`;
+  `;
 
   return (
     <View style={styles.container}>
