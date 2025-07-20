@@ -10,7 +10,7 @@ export default function MapScreen() {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Map with Distance</title>
+  <title>Travel Distance & Emissions</title>
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
   <style>
     body, html, #map {
@@ -23,16 +23,10 @@ export default function MapScreen() {
       background: white;
       z-index: 10;
       display: flex;
+      flex-direction: column;
       gap: 10px;
-      flex-wrap: wrap;
-      align-items: flex-end;
     }
-    .autocomplete-wrapper {
-      position: relative;
-      flex: 1 1 40%;
-      min-width: 200px;
-    }
-    input {
+    input, select, button {
       width: 100%;
       padding: 8px;
       font-size: 16px;
@@ -56,26 +50,24 @@ export default function MapScreen() {
     ul.autocomplete-list li:hover {
       background-color: #eee;
     }
-    #distance {
-      padding: 10px;
+    #distance, #cost, #emissions, #error {
+      padding: 8px 10px;
       font-weight: bold;
+    }
+    #error {
+      color: red;
     }
     #map {
       flex: 1 1 auto;
       position: relative;
     }
     #enter-btn {
-      padding: 10px 20px;
-      font-size: 16px;
       background-color: #39a465;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       user-select: none;
-      flex-shrink: 0;
-      height: 42px;
-      align-self: stretch;
     }
     #enter-btn:disabled {
       background-color: #a5d6a7;
@@ -85,17 +77,31 @@ export default function MapScreen() {
 </head>
 <body>
   <div id="search-container">
-    <div class="autocomplete-wrapper">
+    <div style="position:relative;">
       <input id="from" placeholder="Enter start location" autocomplete="off" />
       <ul id="from-list" class="autocomplete-list"></ul>
     </div>
-    <div class="autocomplete-wrapper">
+    <div style="position:relative;">
       <input id="to" placeholder="Enter destination" autocomplete="off" />
       <ul id="to-list" class="autocomplete-list"></ul>
     </div>
+    <select id="travel-mode" aria-label="Select travel mode">
+      <option value="" disabled selected>Select travel mode</option>
+      <option value="walk">Walk</option>
+      <option value="bike">Bike</option>
+      <option value="ebike">Electric Bike</option>
+      <option value="car">Car</option>
+      <option value="bus">Bus</option>
+      <option value="motorcycle">Motorcycle</option>
+      <option value="truck">Truck</option>
+      <option value="airplane">Airplane</option>
+    </select>
     <button id="enter-btn" disabled>Enter</button>
   </div>
+  <div id="error"></div>
   <div id="distance">Distance: N/A</div>
+  <div id="cost">Cost: N/A</div>
+  <div id="emissions">CO₂ Emissions: N/A</div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -109,6 +115,17 @@ export default function MapScreen() {
 
     let fromMarker = null;
     let toMarker = null;
+
+    const travelData = {
+      walk:       { costPerMile: 0,    emissionsPerMile: 0,       allowsWater: false },
+      bike:       { costPerMile: 0,    emissionsPerMile: 0,       allowsWater: false },
+      ebike:      { costPerMile: 0.02, emissionsPerMile: 0.015,   allowsWater: false },
+      car:        { costPerMile: 0.58, emissionsPerMile: 0.404,   allowsWater: false },
+      bus:        { costPerMile: 0.24, emissionsPerMile: 0.089,   allowsWater: false },
+      motorcycle: { costPerMile: 0.35, emissionsPerMile: 0.103,   allowsWater: false },
+      truck:      { costPerMile: 0.65, emissionsPerMile: 1.07,    allowsWater: false },
+      airplane:   { costPerMile: 0.13, emissionsPerMile: 0.285,   allowsWater: true  },
+    };
 
     function distanceKm(coord1, coord2) {
       const toRad = (deg) => deg * Math.PI / 180;
@@ -184,12 +201,39 @@ export default function MapScreen() {
       });
     }
 
+    function getContinent(lon, lat) {
+      if (lat >= 7 && lat <= 84 && lon >= -170 && lon <= -50) return "NA";
+      if (lat >= -57 && lat < 7 && lon >= -90 && lon <= -30) return "SA";
+      if (lat >= 35 && lat <= 72 && lon >= -10 && lon <= 40) return "EU";
+      if (lat >= -35 && lat <= 37 && lon >= -20 && lon <= 55) return "AF";
+      if (lat >= 5 && lat <= 55 && lon >= 60 && lon <= 150) return "AS";
+      if (lat >= -50 && lat <= 0 && lon >= 110 && lon <= 180) return "OC";
+      return "OTHER";
+    }
+
+    function crossesWater(from, to) {
+      const contFrom = getContinent(from[0], from[1]);
+      const contTo = getContinent(to[0], to[1]);
+
+      if (contFrom === "OTHER" || contTo === "OTHER") return true;
+      return contFrom !== contTo;
+    }
+
     let fromCoords = null;
     let toCoords = null;
+    let travelMode = null;
 
     function updateEnterButton() {
       const btn = document.getElementById("enter-btn");
-      btn.disabled = !(fromCoords && toCoords);
+      btn.disabled = !(fromCoords && toCoords && travelMode);
+      clearMessages();
+    }
+
+    function clearMessages() {
+      document.getElementById("error").textContent = "";
+      document.getElementById("distance").textContent = "Distance: N/A";
+      document.getElementById("cost").textContent = "Cost: N/A";
+      document.getElementById("emissions").textContent = "CO₂ Emissions: N/A";
     }
 
     function clearMap() {
@@ -206,6 +250,23 @@ export default function MapScreen() {
 
     function calculateAndDisplay() {
       clearMap();
+      clearMessages();
+
+      const km = distanceKm(fromCoords, toCoords);
+      const miles = km * 0.621371;
+
+      if (miles < 10) {
+        document.getElementById("error").textContent = "Distance must be at least 10 miles.";
+        return;
+      }
+
+      const modeData = travelData[travelMode];
+      const waterCrossing = crossesWater(fromCoords, toCoords);
+
+      if (!modeData.allowsWater && waterCrossing) {
+        document.getElementById("error").textContent = travelMode.charAt(0).toUpperCase() + travelMode.slice(1) + " cannot travel over water.";
+        return;
+      }
 
       fromMarker = new maplibregl.Marker({ color: "green" }).setLngLat(fromCoords).addTo(map);
       toMarker = new maplibregl.Marker({ color: "red" }).setLngLat(toCoords).addTo(map);
@@ -218,7 +279,6 @@ export default function MapScreen() {
         },
       };
 
-      // Remove existing layer and source if present (extra safety)
       if (map.getLayer("route")) map.removeLayer("route");
       if (map.getSource("route")) map.removeSource("route");
 
@@ -246,8 +306,13 @@ export default function MapScreen() {
       bounds.extend(toCoords);
       map.fitBounds(bounds, { padding: 40 });
 
-      const km = distanceKm(fromCoords, toCoords).toFixed(2);
-      document.getElementById("distance").textContent = "Distance: " + km + " km";
+      document.getElementById("distance").textContent = "Distance: " + miles.toFixed(2) + " miles";
+
+      const cost = modeData.costPerMile * miles;
+      const emissions = modeData.emissionsPerMile * miles;
+
+      document.getElementById("cost").textContent = "Cost: $" + cost.toFixed(2);
+      document.getElementById("emissions").textContent = "CO₂ Emissions: " + emissions.toFixed(2) + " kg";
     }
 
     setupAutocomplete("from", "from-list", coords => {
@@ -260,8 +325,13 @@ export default function MapScreen() {
       updateEnterButton();
     });
 
+    document.getElementById("travel-mode").addEventListener("change", (e) => {
+      travelMode = e.target.value;
+      updateEnterButton();
+    });
+
     document.getElementById("enter-btn").addEventListener("click", () => {
-      if (fromCoords && toCoords) {
+      if (fromCoords && toCoords && travelMode) {
         calculateAndDisplay();
       }
     });
