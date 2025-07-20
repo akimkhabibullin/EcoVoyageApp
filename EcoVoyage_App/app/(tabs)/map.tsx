@@ -20,7 +20,7 @@ export default function MapScreen() {
     }
     #search-container {
       padding: 10px;
-      background: white;
+      background: #97e28f;
       z-index: 10;
       display: flex;
       flex-direction: column;
@@ -70,7 +70,7 @@ export default function MapScreen() {
       user-select: none;
     }
     #enter-btn:disabled {
-      background-color: #a5d6a7;
+      background-color: #39a465;
       cursor: not-allowed;
     }
     #car-options {
