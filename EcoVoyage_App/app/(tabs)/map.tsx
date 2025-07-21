@@ -14,10 +14,11 @@ export default function MapScreen() {
   <title>Travel Distance & Emissions</title>
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
   <style>
-    body, html, #map {
+    body, html {
       margin: 0; padding: 0; height: 100%; width: 100%;
       font-family: Arial, sans-serif;
-      display: flex; flex-direction: column;
+      display: flex;
+      flex-direction: column;
     }
     #search-container {
       padding: 10px;
@@ -56,18 +57,28 @@ export default function MapScreen() {
     ul.autocomplete-list li:hover {
       background-color: #eee;
     }
-    #distance, #cost, #emissions, #duration, #co2saved, #error {
+    .data-display { /* New class for data display elements */
       padding: 8px 10px;
       font-weight: bold;
       background-color: #97e28f;
+      display: none; /* Initially hidden */
     }
     #error {
       color: red;
+      /* Inherits padding, font-weight, background-color from .data-display */
     }
     #map {
-      flex: 1 1 auto;
+      flex: 1 1 auto; /* Default size */
       position: relative;
+      transition: flex 0.3s ease-in-out; /* Smooth transition for map size */
     }
+    #map.expanded {
+      flex: 5; /* Example: Make map larger when dropdown is closed */
+    }
+    #map.collapsed {
+      flex: 1; /* Example: Make map smaller when dropdown is open */
+    }
+
     #enter-btn {
       background-color: #39a465;
       color: white;
@@ -84,6 +95,16 @@ export default function MapScreen() {
       display: none;
       flex-direction: column;
       gap: 10px;
+    }
+
+    /* Dropdown for data display options */
+    #display-options {
+      margin-top: 10px;
+      padding: 8px;
+      font-size: 16px;
+      background-color: #d4f2cc; /* Light green background for the dropdown */
+      border: 1px solid #39a465;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -124,16 +145,24 @@ export default function MapScreen() {
     </div>
 
     <button id="enter-btn" disabled>Enter</button>
-  </div>
-  <div id="error"></div>
-  <div id="distance">Distance: N/A</div>
-  <div id="cost">Cost: N/A</div>
-  <div id="emissions">CO₂ Emissions: N/A</div>
-  <div id="duration">Estimated Time: N/A</div>
-  <div id="co2saved">CO₂ Saved Compared to Car: N/A</div>
-  <div id="map"></div>
 
-  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <select id="display-options" aria-label="Select data to display">
+      <option value="none" selected>Hide Details</option>
+      <option value="distance">Distance</option>
+      <option value="cost">Cost</option>
+      <option value="emissions">CO₂ Emissions</option>
+      <option value="duration">Estimated Time</option>
+      <option value="co2saved">CO₂ Saved Compared to Car</option>
+      <option value="all">Show All Details</option>
+    </select>
+  </div>
+  <div id="error" class="data-display"></div>
+  <div id="distance" class="data-display">Distance: N/A</div>
+  <div id="cost" class="data-display">Cost: N/A</div>
+  <div id="emissions" class="data-display">CO₂ Emissions: N/A</div>
+  <div id="duration" class="data-display">Estimated Time: N/A</div>
+  <div id="co2saved" class="data-display">CO₂ Saved Compared to Car: N/A</div>
+  <div id="map" class="expanded"></div> <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script>
     const map = new maplibregl.Map({
       container: 'map',
@@ -325,16 +354,13 @@ export default function MapScreen() {
       }
 
       btn.disabled = !(fromCoords && toCoords && travelMode && carModelSelected);
-      clearMessages();
+      clearMessages(); // Clear messages on input change
     }
 
     function clearMessages() {
       document.getElementById("error").textContent = "";
-      document.getElementById("distance").textContent = "Distance: N/A";
-      document.getElementById("cost").textContent = "Cost: N/A";
-      document.getElementById("emissions").textContent = "CO₂ Emissions: N/A";
-      document.getElementById("duration").textContent = "Estimated Time: N/A";
-      document.getElementById("co2saved").textContent = "CO₂ Saved Compared to Car: N/A";
+      // Hide all data display elements when clearing messages
+      document.querySelectorAll(".data-display").forEach(el => el.style.display = "none");
     }
 
     function clearMap() {
@@ -347,13 +373,14 @@ export default function MapScreen() {
 
     function calculateAndDisplay() {
       clearMap();
-      clearMessages();
+      clearMessages(); // Ensure all data display elements are hidden initially
 
       const km = distanceKm(fromCoords, toCoords);
       const miles = km * 0.621371;
 
       if (miles < 1) {
         document.getElementById("error").textContent = "Distance must be at least 1 mile.";
+        document.getElementById("error").style.display = "block"; // Show error
         return;
       }
 
@@ -362,6 +389,7 @@ export default function MapScreen() {
       } else {
         if (crossesWater(fromCoords, toCoords)) {
           document.getElementById("error").textContent = "Selected travel mode cannot cross large bodies of water.";
+          document.getElementById("error").style.display = "block"; // Show error
           return;
         }
       }
@@ -375,6 +403,7 @@ export default function MapScreen() {
           modeData.speedMph = travelData.car.speedMph;
         } else {
           document.getElementById("error").textContent = "Please select a car model.";
+          document.getElementById("error").style.display = "block"; // Show error
           return;
         }
       }
@@ -424,6 +453,43 @@ export default function MapScreen() {
       document.getElementById("emissions").textContent = \`CO₂ Emissions: \${emissions} kg\`;
       document.getElementById("duration").textContent = \`Estimated Time: \${durationStr}\`;
       document.getElementById("co2saved").textContent = \`CO₂ Saved Compared to Car: \${co2Saved} kg\`;
+
+      // After calculation, reset the display options to "Hide Details" and update display
+      document.getElementById("display-options").value = "none";
+      updateDisplayOptions(); // Apply initial display state
+    }
+
+    // Function to handle the display options dropdown
+    function updateDisplayOptions() {
+      const selectedOption = document.getElementById("display-options").value;
+      const mapDiv = document.getElementById("map");
+      const dataElements = document.querySelectorAll(".data-display");
+
+      // Hide all data elements first
+      dataElements.forEach(el => el.style.display = "none");
+
+      if (selectedOption === "none") {
+        mapDiv.classList.remove("collapsed");
+        mapDiv.classList.add("expanded");
+      } else {
+        mapDiv.classList.remove("expanded");
+        mapDiv.classList.add("collapsed");
+        if (selectedOption === "all") {
+          document.getElementById("distance").style.display = "block";
+          document.getElementById("cost").style.display = "block";
+          document.getElementById("emissions").style.display = "block";
+          document.getElementById("duration").style.display = "block";
+          document.getElementById("co2saved").style.display = "block";
+        } else {
+          const elementToShow = document.getElementById(selectedOption);
+          // Only show if the element exists and the calculation has been done
+          if (elementToShow && elementToShow.textContent !== "N/A" && elementToShow.id !== "error") { 
+            elementToShow.style.display = "block";
+          } else if (elementToShow && elementToShow.id === "error" && elementToShow.textContent !== "") {
+            elementToShow.style.display = "block";
+          }
+        }
+      }
     }
 
     setupAutocomplete("from", "from-list", coords => {
@@ -468,6 +534,13 @@ export default function MapScreen() {
     document.getElementById("enter-btn").addEventListener("click", () => {
       calculateAndDisplay();
     });
+
+    // Add event listener for the new display options dropdown
+    document.getElementById("display-options").addEventListener("change", updateDisplayOptions);
+
+    // Initial call to set the map to expanded and hide details on load
+    updateDisplayOptions(); 
+
   </script>
 </body>
 </html>
