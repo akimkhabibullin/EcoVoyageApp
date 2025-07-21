@@ -345,8 +345,8 @@ export default function MapScreen() {
       const km = distanceKm(fromCoords, toCoords);
       const miles = km * 0.621371;
 
-      if (miles < 10) {
-        document.getElementById("error").textContent = "Distance must be at least 10 miles.";
+      if (miles < 1) {
+        document.getElementById("error").textContent = "Distance must be at least 1 mile.";
         return;
       }
 
