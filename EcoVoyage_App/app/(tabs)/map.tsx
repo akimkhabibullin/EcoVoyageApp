@@ -505,6 +505,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
     alignItems: 'center',
+    width: 100,
+    alignSelf: 'center',
   },
   backButtonText: {
     color: '#fff',

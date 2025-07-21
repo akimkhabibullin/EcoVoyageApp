@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#97e28f', 
   },
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#000',
   },
@@ -97,5 +97,6 @@ const styles = StyleSheet.create({
   enterText: {
     margin: 10,
     fontWeight: 'bold',
+    fontSize: 16,
   },
 });
