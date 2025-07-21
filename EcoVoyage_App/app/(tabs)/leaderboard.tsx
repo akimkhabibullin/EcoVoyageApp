@@ -38,7 +38,7 @@ export default function LeaderboardScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Top Eco Warriors</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      {/* <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
       
       <FlatList
         data={leaderboardData}
@@ -48,6 +48,15 @@ export default function LeaderboardScreen() {
         scrollEnabled={false}
       />
       
+      <Pressable
+        style={styles.statsButton}
+        onPress={() => router.push('/(tabs)/profile')}
+      >
+        <Text style={styles.title}>Your Stats</Text>
+        <Text style={styles.statsButtonText}>Points: 200</Text>
+        <Text style={styles.statsButtonText}>CO2 Saved: 200</Text>
+      </Pressable>
+
       <Pressable
         style={styles.backButton}
         onPress={() => router.push('/(tabs)/home')}
@@ -130,57 +139,6 @@ const styles = StyleSheet.create({
     width: 80,
     textAlign: 'right',
   },
-  rewardsList: {
-    width: '100%',
-    marginBottom: 20,
-  },
-  rewardItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#39a465',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-  },
-  claimedReward: {
-    opacity: 0.7,
-  },
-  rewardIcon: {
-    fontSize: 30,
-    marginRight: 15,
-  },
-  rewardTextContainer: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  rewardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  rewardDesc: {
-    fontSize: 12,
-    color: '#fff',
-    opacity: 0.8,
-  },
-  rewardPoints: {
-    fontSize: 12,
-    color: '#ffeb3b',
-    marginTop: 5,
-  },
-  claimButton: {
-    backgroundColor: '#ffeb3b',
-    borderRadius: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-  },
-  claimedButton: {
-    backgroundColor: '#ccc',
-  },
-  claimButtonText: {
-    color: '#000',
-    fontWeight: 'bold',
-  },
   backButton: {
     backgroundColor: '#39a465',
     borderRadius: 10,
@@ -193,5 +151,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  statsButton: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    width: 325, 
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  statsButtonText: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 16,
+    paddingBottom: 10,
   },
 });

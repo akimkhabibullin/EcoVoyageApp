@@ -94,16 +94,23 @@ export default function RewardsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Your Points</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <Text style={styles.title}>Your Stats</Text>
+      {/* <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
       
-      <FlatList 
+      {/* <FlatList 
         data={pointsData}
         renderItem={renderPoints}
-      />
+      /> */}
+      
+      <Pressable
+              style={styles.statsButton}
+              onPress={() => router.push('/(tabs)/profile')}
+            >
+              <Text style={styles.statsButtonText}>Points: 200</Text>
+      </Pressable>
 
-      <Text style={styles.title}>Your Rewards</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <Text style={styles.title}>Rewards</Text>
+      {/* <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
       
       <FlatList
         data={rewardsData}
@@ -268,5 +275,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  statsButton: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    width: 200, 
+    marginTop: 5,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  statsButtonText: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 20,
   },
 });
