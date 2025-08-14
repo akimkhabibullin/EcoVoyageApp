@@ -49,9 +49,10 @@ export default function TabOneScreen() {
         </View>
         <Pressable
           style={styles.enterButton}
-          onPress={() => {
-            createUser(email, password, username);
-            router.push("/(tabs)/home");
+          onPress={async () => {
+            if (await createUser(email, password, username)) {
+              router.push("/(tabs)/home");
+            }
           }}
           >
           <Text style={styles.enterText}>Sign Up</Text>
