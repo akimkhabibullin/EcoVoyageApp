@@ -59,10 +59,11 @@ export async function getDataLocal(uid: string): Promise<boolean> {
         localStorage.setItem("email", data.email);
         localStorage.setItem("points", data.points.toString());
         localStorage.setItem("achievements", data.achievements.toString());
-        console.log(`uid: ${uid}, email: ${data.email}, points: ${data.points}`);
+        localStorage.setItem("username", data.username);
         return true;
     }
     else {
         return false;
     }
+
 }
