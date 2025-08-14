@@ -4,44 +4,41 @@ import { addUser, getUserInfo } from './firebaseFunctions';
 
 // to login existing users
 export async function loginUser(email: string, password: string): Promise<boolean> {
-    signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-        // Signed in 
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        getDataLocal(user.uid);
+        await getDataLocal(user.uid);
         return true;
-    })
-    .catch((error) => {
+    } 
+    catch (error: any) {
         const errorCode = error.code;
         const errorMessage = error.message;
 
-        console.error("Error creating user:", errorCode, errorMessage);
+        console.error("Error logging in user:", errorCode, errorMessage);
 
         if (errorCode === 'auth/invalid-credential') {
-        console.error("The email or password entered is incorrect.");
+            console.error("The email or password entered is incorrect.");
         }
         else if (errorCode === 'auth/too-many-requests') {
-        console.error("Too many requests. Please try again later.");
+            console.error("Too many requests. Please try again later.");
         } 
         else if (errorCode === 'auth/invalid-email') {
-        console.error("The email entered is invalid.")
+            console.error("The email entered is invalid.");
         }
         return false;
-    });
-    return false;
+    }
 }
 
 // to create an account
 export async function createUser(email: string, password: string, username: string): Promise<boolean> {
-    createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-        // Signed up 
-        const user = userCredential.user;
-        addUser(user, username)
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user
+        await addUser(user, username);
         getDataLocal(user.uid);
         return true;
-    })
-    .catch((error) => {
+    }
+    catch (error: any) {
         const errorCode = error.code;
         const errorMessage = error.message;
 
@@ -53,9 +50,9 @@ export async function createUser(email: string, password: string, username: stri
         else if (errorCode === 'auth/invalid-email') {
             console.error("The email address is not valid.");
         }
+
         return false;
-    });
-    return false;
+    }
 }
 
 export async function getDataLocal(uid: string): Promise<boolean> {
