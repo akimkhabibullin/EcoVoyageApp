@@ -3,12 +3,13 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 import { addUser, getUserInfo } from './firebaseFunctions';
 
 // to login existing users
-export function loginUser(email: string, password: string) {
+export async function loginUser(email: string, password: string): Promise<boolean> {
     signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
         // Signed in 
         const user = userCredential.user;
         getDataLocal(user.uid);
+        return true;
     })
     .catch((error) => {
         const errorCode = error.code;
@@ -25,17 +26,20 @@ export function loginUser(email: string, password: string) {
         else if (errorCode === 'auth/invalid-email') {
         console.error("The email entered is invalid.")
         }
+        return false;
     });
+    return false;
 }
 
 // to create an account
-export function createUser(email: string, password: string, username: string) {
+export async function createUser(email: string, password: string, username: string): Promise<boolean> {
     createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
         // Signed up 
         const user = userCredential.user;
         addUser(user, username)
         getDataLocal(user.uid);
+        return true;
     })
     .catch((error) => {
         const errorCode = error.code;
@@ -49,7 +53,9 @@ export function createUser(email: string, password: string, username: string) {
         else if (errorCode === 'auth/invalid-email') {
             console.error("The email address is not valid.");
         }
+        return false;
     });
+    return false;
 }
 
 export async function getDataLocal(uid: string): Promise<boolean> {
@@ -65,5 +71,4 @@ export async function getDataLocal(uid: string): Promise<boolean> {
     else {
         return false;
     }
-
 }
