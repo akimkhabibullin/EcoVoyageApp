@@ -31,11 +31,6 @@ export interface Database {
 }
 
 export default function RewardsScreen() {
-  const [oneClaimed, setOneClaimed] = useState<boolean>(false);
-  const [twoClaimed, setTwoClaimed] = useState<boolean>(false);
-  const [threeClaimed, setThreeClaimed] = useState<boolean>(false);
-  const [fourClaimed, setFourClaimed] = useState<boolean>(false);
-  const [fiveClaimed, setFiveClaimed] = useState<boolean>(false);
   const [points, setPoints] = useState<number>();
   const [achievements, setAchievements] = useState(JSON.parse('{"1":false, "2":false, "3":false, "4":false, "5":false}'));
   const [uid, setuid] = useState<string>();
@@ -63,24 +58,6 @@ export default function RewardsScreen() {
     fetchInfo();
   }, []);
 
-  function updateClaimed(id: string): void {
-    if (id == '1') {
-      setOneClaimed(true);
-    }
-    else if (id == '2') {
-      setTwoClaimed(true);
-    }
-    else if (id == '3') {
-      setThreeClaimed(true);
-    }
-    else if (id == '4') {
-      setFourClaimed(true);
-    }
-    else if (id == '5') {
-      setFiveClaimed(true);
-    }
-  }
-
   const router = useRouter();
   
   const pointsData: UserPoints = {
@@ -91,20 +68,12 @@ export default function RewardsScreen() {
   //Change to real rewards
   // Sample data for rewards
   const rewardsData: Reward[] = [
-    { id: '1', title: 'Eco Badge', description: 'Beginner eco warrior', pointsRequired: 100, icon: '🛡️', claimed: oneClaimed },
-    { id: '2', title: 'Discount Coupon', description: '10% off eco products', pointsRequired: 300, icon: '🎟️', claimed: twoClaimed },
-    { id: '3', title: 'Exclusive Content', description: 'Access to eco tips', pointsRequired: 500, icon: '🔓', claimed: threeClaimed },
-    { id: '4', title: 'Plant a Tree', description: 'We plant a tree in your name', pointsRequired: 800, icon: '🌳', claimed: fourClaimed },
-    { id: '5', title: 'VIP Event', description: 'Invitation to eco summit', pointsRequired: 1200, icon: '🎪', claimed: fiveClaimed },
+    { id: '1', title: 'Eco Badge', description: 'Beginner eco warrior', pointsRequired: 100, icon: '🛡️', claimed: achievements[1] },
+    { id: '2', title: 'Discount Coupon', description: '10% off eco products', pointsRequired: 300, icon: '🎟️', claimed: achievements[2] },
+    { id: '3', title: 'Exclusive Content', description: 'Access to eco tips', pointsRequired: 500, icon: '🔓', claimed: achievements[3] },
+    { id: '4', title: 'Plant a Tree', description: 'We plant a tree in your name', pointsRequired: 800, icon: '🌳', claimed: achievements[4] },
+    { id: '5', title: 'VIP Event', description: 'Invitation to eco summit', pointsRequired: 1200, icon: '🎪', claimed: achievements[5] },
   ];
-
-  React.useEffect(() => {
-  for (let i = 0; i < rewardsData.length; i++) {
-    if (achievements[(i + 1).toString()] === true) {
-      updateClaimed(rewardsData[i].id);
-    }
-  }
-  }, [achievements]);
 
   const renderRewardItem = ({ item }: { item: Reward }) => (
     <View style={[styles.rewardItem, item.claimed ? styles.claimedReward : null]}>
@@ -124,7 +93,7 @@ export default function RewardsScreen() {
         onPress={async () => {
           if (points !== undefined && points !== null && points >= item.pointsRequired) {
             // update points
-            updateClaimed(item.id);
+            achievements[Number(item.id)] = true;
 
             const newPoints = points - item.pointsRequired;
             setPoints(newPoints);
