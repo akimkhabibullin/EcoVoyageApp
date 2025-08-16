@@ -83,16 +83,11 @@ export default function RewardsScreen() {
 
   const router = useRouter();
   
-  const pointsData: UserPoints[] = [
-    {userId: `${username}: `, points: points ?? 0}
-  ]
+  const pointsData: UserPoints = {
+    userId: `${username}: `,
+    points: points ?? 0
+  }
 
-  const renderPoints = ({ item }: { item: UserPoints }) =>(
-    <View style={[styles.pointItem]}>
-      <Text style={styles.title}>{item.userId}</Text>
-      <Text style={styles.title}>{item.points}</Text>
-    </View>
-  );
   //Change to real rewards
   // Sample data for rewards
   const rewardsData: Reward[] = [
@@ -153,22 +148,6 @@ export default function RewardsScreen() {
       </Pressable>
     </View>
   );
-  // const renderRewardItem = ({ item }: { item: Reward }) => (
-  //   <View style={[styles.rewardItem, item.claimed ? styles.claimedReward : null]}>
-  //     <Text style={styles.rewardIcon}>{item.icon}</Text>
-  //     <View style={styles.rewardTextContainer}>
-  //       <Text style={styles.rewardTitle}>{item.title}</Text>
-  //       <Text style={styles.rewardDesc}>{item.description}</Text>
-  //       <Text style={styles.rewardPoints}>{item.pointsRequired} points</Text>
-  //     </View>
-  //     <Pressable 
-  //       style={[styles.claimButton, item.claimed ? styles.claimedButton : null]}
-  //       disabled={item.claimed || item.pointsRequired > 420} // 420 is current user's points
-  //     >
-  //       <Text style={styles.claimButtonText}>{item.claimed ? 'Claimed' : 'Claim'}</Text>
-  //     </Pressable>
-  //   </View>
-  // );
 
   return (
     <View style={styles.container}>
@@ -180,10 +159,10 @@ export default function RewardsScreen() {
       <Text style={styles.title}>Your Points</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       
-      <FlatList 
-        data={pointsData}
-        renderItem={renderPoints}
-      />
+      <View style={[styles.pointItem]}>
+        <Text style={styles.title}>{pointsData.userId}</Text>
+        <Text style={styles.title}>{pointsData.points}</Text>
+      </View>
 
       <Text style={styles.title}>Your Rewards</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
