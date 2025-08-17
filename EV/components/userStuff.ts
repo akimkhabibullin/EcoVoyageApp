@@ -72,3 +72,11 @@ export async function getDataLocal(uid: string): Promise<boolean> {
         return false;
     }
 }
+
+export async function logoutUser() {
+    await AsyncStorage.removeItem("uid");
+    await AsyncStorage.removeItem("email");
+    await AsyncStorage.removeItem("points");
+    await AsyncStorage.removeItem("achievements");
+    await AsyncStorage.removeItem("username");
+}
