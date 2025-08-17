@@ -3,6 +3,7 @@ import { Pressable, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
 import { getUserInfo } from '@/components/firebaseFunctions';
+import { logoutUser } from '@/components/userStuff';
 
 export default function TabTwoScreen() {
   const router = useRouter();
@@ -44,7 +45,11 @@ export default function TabTwoScreen() {
       </Pressable>
       <Pressable
         style={styles.enterButton}
-        onPress={() => router.push('/')}
+        onPress={() => {
+          logoutUser()
+          router.push('/')
+        }
+        }
         >
         <Text style={styles.enterText}>Log Out</Text>
       </Pressable>
