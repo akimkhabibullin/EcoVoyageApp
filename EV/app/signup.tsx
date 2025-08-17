@@ -12,7 +12,7 @@ export default function TabOneScreen() {
   
 
   return (
-    <ScrollView keyboardShouldPersistTaps="never">
+    <ScrollView keyboardShouldPersistTaps="never" contentContainerStyle={{ flex: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>Welcome To Eco Voyage!</Text>
         <View style={styles.separator} lightColor="#eee" darkColor="#000" />
@@ -66,10 +66,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start', 
-    paddingTop: 160,
+    justifyContent: 'center', 
     backgroundColor: '#97e28f', 
-    paddingBottom: "49.3%"
   },
   title: {
     fontSize: 20,
